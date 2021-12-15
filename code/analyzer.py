@@ -53,7 +53,7 @@ def analyzer():
                         relationships[name1]={}
                     if(relationships[name1].get(name2) is None):
                         relationships[name1][name2]=0
-                    relationships[name1][name2]+=1;
+                    relationships[name1][name2]+=1
     with open("relationship.csv","w",encoding='utf-8') as f:
         f.write("Source,Target,Weight\n")
         for u,e in relationships.items():
