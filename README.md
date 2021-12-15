@@ -1,2 +1,4 @@
 # IR_teamwork
-shared homework
+code为项目代码文件目录
+graph为gephi可打开的网络分析图目录
+文档为项目相关文档集目录
