@@ -28,6 +28,31 @@ def drawerParser():
     #                relation[link[0]][link[1]]=math.log2(1+link[2])
                 relation[link[0]][link[1]]=math.ceil(relation[link[0]][link[1]])
 
+    MajorPerson = list()
+    MajorPerson.append("宝玉")
+    MajorPerson.append("贾蓉")
+    MajorPerson.append("贾珍")
+    MajorPerson.append("秦钟")
+    MajorPerson.append("王熙凤")
+    MajorPerson.append("警幻")
+    MajorPerson.append("尤氏")
+    MajorPerson.append("贾母")
+    MPdict = {}
+    MPdict["宝玉"] = math.ceil(relation["秦可卿"]["宝玉"] * 0.08)
+    MPdict["贾蓉"] = math.ceil(relation["秦可卿"]["贾蓉"] * 0.1)
+    MPdict["贾珍"] = math.ceil(relation["秦可卿"]["贾珍"] * 0.1)
+    MPdict["秦钟"] = math.ceil(relation["秦可卿"]["秦钟"] * 0.1)
+    MPdict["王熙凤"] = math.ceil(relation["秦可卿"]["王熙凤"] * 0.1)
+    MPdict["警幻"] = math.ceil(relation["秦可卿"]["警幻"] * 0.08)
+    MPdict["尤氏"] = math.ceil(relation["秦可卿"]["尤氏"] * 0.08)
+    MPdict["贾母"] = math.ceil(relation["秦可卿"]["贾母"] * 0.08)
+
+    for link in relationship_data_list:
+        if link[0] in MajorPerson:
+            if relation['秦可卿'].get(link[1]) is None:
+                relation["秦可卿"][link[1]] = 0
+            relation['秦可卿'][link[1]] += MPdict[link[0]] #双向的，所以只算一边
+
     SortList = list()
     for u,e in relation.items():
         for i,j in e.items():
