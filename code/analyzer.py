@@ -16,11 +16,18 @@ def analyzer():
     relationships={}
     relationships["秦可卿"]={}
     lineNum=0
+    nameStorage=list()
+    nameStorage.append(list())
+    nameStorage.append(list())
+    nameStorage.append(list())
+    nameStorage.append(list())
+    nameStorage.append(list())
+    use = 0
     for line in text:#对每一个段落进行检查
         lineDivider=divider.cut(line)#用jieba词性分词
-        nameStorage=[]#存储当前段落中出现的人名
+        nameStorage[use]=list()#存储当前段落中出现的人名
         nameIdfStorage={}
-        lineNum+=1
+        hasitem = 0
         for item in lineDivider:
             #秦可卿的各种别名
             if item.word=='可卿' or item.word=='可儿' or item.word=='秦氏' or item.word=='蓉大奶奶' or item.word=='兼美':#把可卿过滤掉，顺便mark一下这段有可卿
@@ -33,9 +40,12 @@ def analyzer():
                 item.word='王熙凤'
                 item.flag='nr'
             #找在人名词典中的,第一个判断可以过滤掉很多没用的东西能跑快很多
+            if (item.word==' ' ) or (item.word == '\n'): #去掉空行
+                continue
+            hasitem = 1
             if (item.flag!="nr" and item.flag!="n") or item.word not in nameList:
                 continue
-            nameStorage.append(item.word)
+            nameStorage[use].append(item.word)
             if nameCnt.get(item.word) is None:#Idf和Cnt同时第一次出现
                 nameCnt[item.word]=0
                 nameIdf[item.word]=0
@@ -46,14 +56,27 @@ def analyzer():
                 print("where is fengjie")
                 return
             nameCnt[item.word] += 1
-        for name1 in nameStorage:#扫一下当前段落的人名并增加他们的关系得分
-            for name2 in nameStorage:
-                if(name1!=name2):
-                    if relationships.get(name1) is None:
-                        relationships[name1]={}
-                    if(relationships[name1].get(name2) is None):
-                        relationships[name1][name2]=0
-                    relationships[name1][name2]+=1
+
+        lineNum+=hasitem
+        allname = list()
+        if (lineNum >= 127 and lineNum <= 517):
+            for i in range(0, 5):
+                for item in nameStorage[i]:
+                    allname.append(item)
+        else:
+            for item in nameStorage[use]:
+                allname.append(item)
+        if (hasitem):
+            for name1 in allname:#扫一下当前段落的人名并增加他们的关系得分
+                for name2 in allname:
+                    if(name1!=name2):
+                        if relationships.get(name1) is None:
+                            relationships[name1]={}
+                        if(relationships[name1].get(name2) is None):
+                            relationships[name1][name2]=0
+                        relationships[name1][name2]+=1
+        use = (use + 1) % 5
+
     with open("relationship.csv","w",encoding='utf-8') as f:
         f.write("Source,Target,Weight\n")
         for u,e in relationships.items():
@@ -66,8 +89,8 @@ def analyzer():
     with open("nameidf.csv", "w", encoding='utf-8') as f:
         f.write("Id,Label,Idf\n")
         for name, times in nameIdf.items():
-            f.write(name + "," + name + "," + str(math.ceil(math.log2(lineNum/times))) + "\n")
-
+            f.write(name + "," + name + "," +str(math.ceil(math.log10((lineNum + 1)/(times + 1)))) + "\n")
+    #126第五回开始,517第十五回结束
 def main():
     if(__name__!='__main__'):
         return
